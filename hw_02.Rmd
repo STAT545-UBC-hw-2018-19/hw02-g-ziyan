@@ -1,0 +1,109 @@
+---
+title: "hw02"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Step 1: Smell test the data
+Load the data set and try to figure out what the data set looks like. 
+```{r}
+library(gapminder)
+library(tidyverse)
+typeof(gapminder)
+class(gapminder)
+ncol(gapminder)
+nrow(gapminder)
+length(gapminder)
+str(gapminder)
+```
+### Step 2: Explore individual variables
+```{r}
+summary(gapminder$continent) 
+```
+
+Take all countries in Europe that have a GDP per capita greater than 40000, and select all variables except gdpPercap. 
+
+```{r}
+gapminder %>%
+  filter(gdpPercap>40000 & continent=="Europe") %>% 
+  select(-gdpPercap) %>% 
+  knitr::kable()
+
+```
+
+
+### Step 3: Explore various plot types
+- **Scatter plot**
+
+Look at the relationship between gdpPercap and lifeExp.
+
+```{r}
+gapminder %>% 
+    filter(continent=="Europe") %>% 
+    ggplot(aes(x=log(gdpPercap), y=lifeExp))+
+    geom_point()
+```
+
+Obviously, higher gdp per capita usually leads to longer lifetime in Europe.
+
+- **Density plot**
+
+Show the distribution of population in each continent.
+```{r}
+library(tidyverse)
+gapminder %>% 
+    ggplot(aes(pop,fill= continent))+
+    scale_x_log10()+
+    geom_histogram(bins=20)
+```
+
+It can be concluded that Africa accounts for the highest pencentage of population in the world. And there is a high variance of population in Asia.
+
+- **Line plot**
+
+Focus on the trend of population of each city in Europe and Asia.
+
+```{r}
+gapminder %>%  
+  filter(continent=="Asia"|continent=="Europe") %>% 
+  ggplot(aes(year, pop, group=country, color=continent)) +
+  scale_y_log10()+
+  geom_line()
+```
+
+These years the countries in Asia have seen a remarkable increase on population. Whereas most of countries in Europe keep steady generally on that.
+
+### Go further
+
+1. Logical Operators
+
+Get the data for Rwanda and Afghanistan.
+ 
+```{r}
+filter(gapminder, country=="Rwanda"|country=="Afghanistan") %>% 
+knitr::kable()
+```
+
+"||" couldn't achieve filter here. Since it evaluates left to right examining only the first element of each vector. 
+
+```{r}
+filter(gapminder, country=="Rwanda"||country=="Afghanistan")
+```
+
+2. More dplyr: `group_by` and `transmute` 
+
+Sum over the population of each continent in 2007. 
+```{r}
+library(dplyr)
+a <- group_by(gapminder, continent)  
+a <- filter(a, year==2007)
+a <- transmute(a, cum = cumsum(as.numeric(pop))) 
+filter(a, cum==max(cum) ) %>% 
+  knitr::kable()
+```
+
+`group_by` takes an existing tbl and converts it into a grouped tbl.
+
+`transmute` adds new variables and drops existing variables.
