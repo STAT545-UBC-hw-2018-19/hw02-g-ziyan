@@ -63,27 +63,25 @@ It can be concluded that Africa accounts for the highest pencentage of populatio
 
 - **Line plot**
 
-Focus on the trend of population of each city in Europe and Asia.
+Compare the trend of population in Canada and Australia.
 
 ```{r}
 gapminder %>%  
-  filter(continent=="Asia"|continent=="Europe") %>% 
-  ggplot(aes(year, pop, group=country, color=continent)) +
-  scale_y_log10()+
+  filter(country=="Canada"|country=="Australia") %>% 
+  ggplot(aes(year, pop, color=country)) +
   geom_line()
 ```
 
-These years the countries in Asia have seen a remarkable increase on population. Whereas most of countries in Europe keep steady generally on that.
+These years Canada has seen a faster increase on population than that of Australia. 
 
 ### Go further
 
-1. Logical Operators
+1. **Get the data for Rwanda and Afghanistan**
 
-Get the data for Rwanda and Afghanistan.
- 
+- Logical operators
+
 ```{r}
-filter(gapminder, country=="Rwanda"|country=="Afghanistan") %>% 
-knitr::kable()
+filter(gapminder, country=="Rwanda"|country=="Afghanistan") %>%   knitr::kable()
 ```
 
 "||" couldn't achieve filter here. Since it evaluates left to right examining only the first element of each vector. 
@@ -92,7 +90,21 @@ knitr::kable()
 filter(gapminder, country=="Rwanda"||country=="Afghanistan")
 ```
 
-2. More dplyr: `group_by` and `transmute` 
+- `c` function 
+
+Since what we want is that country equals either Rwanda or Afghanistan, `%in%` should be used instead of `==`.
+
+```{r}
+filter(gapminder, country %in% c("Rwanda", "Afghanistan")) %>% 
+  knitr::kable()
+```
+
+```{r}
+filter(gapminder, country == c("Rwanda", "Afghanistan")) %>% 
+  knitr::kable()
+```
+
+2. **More dplyr: `group_by` and `transmute`** 
 
 Sum over the population of each continent in 2007. 
 ```{r}
